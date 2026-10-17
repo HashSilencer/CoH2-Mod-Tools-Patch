@@ -1,0 +1,37 @@
+# Posts each published release (title, notes, download links) to the Discord channel behind the
+# DISCORD_WEBHOOK secret. Run it by hand (Actions > Discord release notice > Run workflow) to post
+# an existing release again.
+name: Discord release notice
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to post (e.g. v1.1)
+        required: true
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post to Discord
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: |
+          gh api "repos/${{ github.repository }}/releases/tags/$TAG" > release.json
+          jq '{
+            username: "CoH2 Mod Tools Patch",
+            embeds: [{
+              title: ("CoH2 Mod Tools Patch " + .name),
+              url: .html_url,
+              color: 5793266,
+              description: (.body // "" | .[0:4000]),
+              fields: [{name: "Download", value: ([.assets[] | "[\(.name)](\(.browser_download_url))"] | join("\n") | .[0:1000])}],
+              timestamp: .published_at
+            }]
+          }' release.json > payload.json
+          curl -sSf -H "Content-Type: application/json" -d @payload.json "$WEBHOOK"
