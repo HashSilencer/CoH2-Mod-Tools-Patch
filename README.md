@@ -4,7 +4,9 @@ A drop-in patch for the **Company of Heroes 2 Tools** (Attribute Editor and ModB
 
 - **Bug fixes**: no more scroll jumping to the top, no crash when another program holds the clipboard,
   base-game text shown when the editor is started directly, Ctrl+V pastes into every selected value,
-  no crash after canceling a ModBuilder build or refreshing Find References after a delete.
+  no crash after canceling a ModBuilder build or refreshing Find References after a delete,
+  open category tabs kept when the editor is closed while loading, Undo of a customized base-game text
+  really goes back to the base-game text.
 - **Safer delete**: references are moved to another instance (or the base-game original) before deleting,
   and both steps can be undone.
 - **Themes**: Classic, Light and Dark.
